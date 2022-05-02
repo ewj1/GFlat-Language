@@ -4,12 +4,32 @@ open Parser
 
 
 (* AST *)
+
 type Instrument =
 | Piano
 
+type Note =
+| C
+| Csharp
+| Dflat
+| D
+| Dsharp
+| Eflat
+| E
+| F
+| Fsharp
+| Gflat
+| G
+| Gsharp
+| Aflat
+| A
+| Asharp
+| Bflat
+| B
+
 type Chord =
-| Maj of string
-| Min of string
+| Maj of Note
+| Min of Note
 
 type SoundInstruction =
 | Sound of Instrument * Chord
@@ -34,12 +54,22 @@ type Expr =
 
 (* Grammar *)
 
-let pinstrument: Parser<Instrument> = pleft (pstr "Piano" |>> (fun _ -> Piano)) pws1  //parses an instrument
-let pchord: Parser<Chord> = pleft (pstr "C maj" |>> (fun _ -> Maj "C")) pws0          //parses a chord (right now only C maj but soon to be expanded!)
-let psound: Parser<SoundInstruction> = pseq pinstrument pchord (fun a -> Sound a)     //parses an instrument and chord together
-let psoundInstruction: Parser<SoundInstruction> = pleft psound pws0                   //parses many instrument and chords pairs
-let pexpr: Parser<Expr> = pmany1 psoundInstruction |>> (fun ss -> SoundInstructions ss) //parses many of the series of pairs referred to above
-let grammar: Parser<Expr> = pleft pexpr peof //parses an expression and makes sure we reach the end
+//parses a note (the letter name of a chord)
+let pnote: Parser<Note> = (pfresult (pstr "C#") Csharp) <|> (pfresult (pstr "C") C) <|> (pfresult (pstr "Db") Dflat) <|> (pfresult (pstr "D#") Dsharp) <|> (pfresult (pstr "D") D) <|> (pfresult (pstr "Eb") Eflat) <|> (pfresult (pstr "E") E) <|> (pfresult (pstr "F#") Fsharp) <|> (pfresult (pstr "F") F) <|> (pfresult (pstr "Gb") Gflat) <|> (pfresult (pstr "G#") Gsharp) <|> (pfresult (pstr "G") G) <|> (pfresult (pstr "Ab") Aflat) <|> (pfresult (pstr "A#") Asharp) <|> (pfresult (pstr "A") A) <|> (pfresult (pstr "Bb") Bflat) <|> (pfresult (pstr "B") B)
+//parses the quality of a chord
+let pchordquality = (pfresult (pstr "maj") Maj) <|> (pfresult (pstr "min") Min)
+//parses an instrument
+let pinstrument: Parser<Instrument> = pleft (pstr "Piano" |>> (fun _ -> Piano)) pws1
+// parses a chord
+let pchord: Parser<Chord> = pleft (pseq (pleft pnote pws0) pchordquality (fun (a,b) -> b a)) pws0
+//parses an instrument and chord together
+let psound: Parser<SoundInstruction> = pseq pinstrument pchord (fun a -> Sound a)
+//parses many instrument and chords pairs
+let psoundInstruction: Parser<SoundInstruction> = pleft psound pws0
+//parses many of the series of pairs referred to above
+let pexpr: Parser<Expr> = pmany1 psoundInstruction |>> (fun ss -> SoundInstructions ss)
+//parses an expression and makes sure we reach the end
+let grammar: Parser<Expr> = pleft pexpr peof 
 
 let parse(input: string) : Expr option =
     let i = prepare input
