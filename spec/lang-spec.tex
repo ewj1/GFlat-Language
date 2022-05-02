@@ -19,7 +19,8 @@
 	algorithm,
 	algorithmic,
 	xspace,
-	hyperref}
+	hyperref,
+	comment}
 \usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
 \usepackage{sect sty}	%For centering section headings
 \usepackage{enumerate}	%Allows more labeling options for enumerate environments 
@@ -76,6 +77,30 @@
 
 \vspace{\baselineskip}
 
+\section{Updates for lab 9}
+
+\begin{verbatim}
+    <expr>       ::= <sound>+
+    <sound>      ::= <instrument> <ws> <chord>
+    <chord>      ::= <note> <ws> <quality>
+    <instrument> ::= Piano
+    <ws>         ::= ␣
+    <note>       ::= C
+    <quality>    ::= Maj
+\end{verbatim}
+
+\begin{center}
+\begin{tabular}{c|c|c|c|p{5cm}} 
+ Syntax & Abstract syntax & Type & Prec./Assoc. & Meaning \\ [0.5ex] 
+ \hline
+  ``Piano" & Piano & Instrument & n/a & The type of instrument playing a given chord \\ 
+ \hline
+ ``n maj" & Maj of string & string → Chord & n/a & A chord to be played where n is some string representing the letter name of the chord \\ 
+ % \hline
+ % ``C maj" & Chord & string -> string & n/a & ?? \\ [1ex] 
+\end{tabular}
+\end{center}
+
 \section{Introduction}
 
 I (Ezra) play alto sax in a jazz combo here, and when I'm struggling with soloing over certain songs, it helps me to run over the chord changes and play along with the recording, but the best is when there's a backing track on YouTube, so I can play along with the chords without drowning whoever is soloing on the recording. I'm imagining a program that would make it easy to quickly create a backing track to play over. I imagine that you'd have to define what instrument are playing, write chords and their duration/order, set the tempo and define the length of one chorus of the song. The output would be a simple chart with the chord names along a musical bar notation of the song, and ideally a matching audio output (that keeps looping).
@@ -117,6 +142,69 @@ Example 3:
   
   play Chorus 4
 \end{verbatim}
+
+\begin{comment}
+Example 1:
+\begin{verbatim}
+  start Chorus (bars(4) 12, volume 100, tempo 120)
+      for bars(1,12):
+          drums swing
+      for bars(1,4):
+          piano and guitar (Cmin7)
+      for bars(5,8):
+          piano and guitar (F7)
+      for bars(9,12):
+          piano and guitar (D7)
+  end Chorus
+  
+  play Chorus
+\end{verbatim}
+
+Example 2:
+\begin{verbatim}
+  start Intro (bars(4) 1, volume 60, tempo 100)
+      for bars(1,1):
+          drums funk
+  end Intro
+  
+  start Chorus (bars(4) 12, volume 80, tempo 100)
+      for bars(1,12):
+          drums funk
+      for bars(1,4):
+          piano and guitar (Cmin7)
+          bass walk (Cmin7)
+      for bars(5,8):
+          piano and guitar (Fmaj)
+          bass walk (F7)
+      for bars(9,9):
+          set volume 100
+          piano and bass (F#dim7)
+      for bars(10,12):
+          piano and guitar (D7)
+          bass walk (D7)
+  end Chorus
+  
+  play Intro 4
+  play Chorus 10
+\end{verbatim}
+
+Example 3:
+\begin{verbatim}
+  start Chorus (bars(4) 6, volume 100, tempo 144)
+      for bars(1,1):
+          piano (Cmaj)
+      for bars(2,2):
+          piano (Fmaj)
+      for bars(3,3):
+          piano (Cmaj)
+      for bars(4,4):
+          piano and guitar (G7)
+      for bars(5,6):
+          piano (Cmaj)
+  end Chorus
+  play Chorus
+\end{verbatim}
+\end{comment}
 
 \section{Language Concepts}
     In order to program in the language, a user should understand the sounds/names of different instruments, have a basic understanding of chords (so they can specify them by writing out their letters), an understanding of a bar/measure which is a grouping of several beats of music. They should understand also how to transfer information from a written piece of sheet music with chords to information within the language, by copying down chords and putting them loops for the appropriate bars. We hope to also provide specifiers like volume, and tempo, so a user should understand how those qualities would affect the output. 
@@ -191,6 +279,7 @@ such a traversal yields the effect you just described and provide illustrations 
     \end{enumerate}
 
 \end{enumerate}
+
 
 % DO NOT DELETE ANYTHING BELOW THIS LINE
 \end{document}
