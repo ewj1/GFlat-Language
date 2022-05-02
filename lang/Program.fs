@@ -7,17 +7,18 @@ let main argv =
         printfn "Usage: dotnet run <program>"
         exit 1
     let ast_maybe = parse argv.[0]
-    match ast_maybe with
+
+    (*match ast_maybe with
     | Some ast ->
         printfn "%s" (eval ast)
-    | None -> printfn "bad sentence"
-   (* match ast_maybe with
+    | None -> printfn "bad sentence" *)
+    
+    match ast_maybe with
     | Some ast ->
         let output = eval ast
-        use sw = new StreamWriter("output.svg")
+        use sw = new StreamWriter("output.musicxml")
         sw.WriteLine(output)
     | None     ->
         printfn "Invalid program."
-        exit 1 *)
-    
+        exit 1 
     0
