@@ -20,14 +20,12 @@
         </time>
       </attributes><note><pitch>
            <step>G</step>
-           <alter>1</alter>
            <octave>4</octave>
-         </pitch><duration>4</duration></note><note><chord/><pitch>
+         </pitch><duration>1</duration></note><note><chord/><pitch>
            <step>B</step>
            <octave>4</octave>
-         </pitch><duration>4</duration></note><note><chord/><pitch>
+         </pitch><duration>1</duration></note><note><chord/><pitch>
            <step>D</step>
-           <alter>1</alter>
            <octave>5</octave>
-         </pitch><duration>4</duration></note></measure></part>
+         </pitch><duration>1</duration></note></measure></part>
 </score-partwise>
