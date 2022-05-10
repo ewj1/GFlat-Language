@@ -2,7 +2,7 @@
 open System.IO
 
 [<EntryPoint>]
-(*let main argv =
+let main argv =
     if argv.Length <> 1 then
         printfn "Usage: dotnet run <program>"
         exit 1
@@ -16,14 +16,14 @@ open System.IO
     match ast_maybe with
     | Some ast ->
         let output = eval ast
-        use sw = new StreamWriter("output.musicxml")
+        use sw = new StreamWriter("output.xml")
         sw.WriteLine(output)
     | None     ->
         printfn "Invalid program."
         exit 1 
     0
-*)
 
+(*
 let main argv =
     if argv.Length <> 1 then
         printfn "Usage: dotnet run <program>"
@@ -37,3 +37,4 @@ let main argv =
         printfn "Invalid program."
         exit 1 
     0
+*)
