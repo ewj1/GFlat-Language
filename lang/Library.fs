@@ -5,9 +5,6 @@ open Parser
 
 (* AST *)
 
-type Instrument =
-| Piano
-
 type Note =
 | C
 | Csharp
@@ -28,32 +25,72 @@ type Note =
 | B
 
 type Chord =
+// chord qualities and their starting note
 | Maj of Note
 | Min of Note
 
-type SoundInstruction =
-| Sound of Instrument * Chord
+type Sound = Sound of Chord * int
 
 type Expr =
-| SoundInstructions of SoundInstruction list
+// variable name    
+| Variable of string
+// a series of sounds grouped together to form a part of a song (e.g. an "intro" or "chorus")
+| Section of Sound list
+// assigns section to variable
+| Assignment of Expr * Expr
+// a list of sections and how many times they should repeat
+| Play of (Expr * int) list
+// a type to store sequences
+| Sequence of Expr list
 
 
 (* Grammar *)
 
+let reserved = []
+
 //parses a note (the letter name of a chord)
 let pnote: Parser<Note> = (pfresult (pstr "C#") Csharp) <|> (pfresult (pstr "C") C) <|> (pfresult (pstr "Db") Dflat) <|> (pfresult (pstr "D#") Dsharp) <|> (pfresult (pstr "D") D) <|> (pfresult (pstr "Eb") Eflat) <|> (pfresult (pstr "E") E) <|> (pfresult (pstr "F#") Fsharp) <|> (pfresult (pstr "F") F) <|> (pfresult (pstr "Gb") Gflat) <|> (pfresult (pstr "G#") Gsharp) <|> (pfresult (pstr "G") G) <|> (pfresult (pstr "Ab") Aflat) <|> (pfresult (pstr "A#") Asharp) <|> (pfresult (pstr "A") A) <|> (pfresult (pstr "Bb") Bflat) <|> (pfresult (pstr "B") B)
+
 //parses the quality of a chord
 let pchordquality = (pfresult (pstr "maj") Maj) <|> (pfresult (pstr "min") Min)
-//parses an instrument
-let pinstrument: Parser<Instrument> = pleft (pstr "Piano" |>> (fun _ -> Piano)) pws1
+
 // parses a chord
 let pchord: Parser<Chord> = pleft (pseq (pleft pnote pws0) pchordquality (fun (a,b) -> b a)) pws0
-//parses an instrument and chord together
-let psound: Parser<SoundInstruction> = pseq pinstrument pchord (fun a -> Sound a)
+
+let pduration: Parser<int> = pmany1 pdigit
+                             |>> (fun digits ->
+                                    let s = stringify digits
+                                    let n = int s
+                                    n
+                                  ) <!> "pduration"
+                                  
+//parses a chord and duration together
+let psound: Parser<Sound> = pseq pchord pduration (fun (a,b) -> Sound(a,b))
+
 //parses many instrument and chords pairs
-let psoundInstruction: Parser<SoundInstruction> = pleft psound pws0
+let psection: Parser<Expr> = (pmany1 psound) |>> (fun soundList -> Section soundList)
+
+let pvarchar: Parser<char> = pletter <|> pdigit <!> "pvarchar"
+
+let pvar: Parser<Expr> = pseq pletter (pmany0 pvarchar |>> stringify)
+                           (fun (c: char, s: string) -> (string c) + s)
+                           |>> (fun v ->
+                                 if List.contains v reserved then
+                                     failwith ("'" + v + "' is a reserved word.")
+                                 else
+                                     Variable v
+                               ) <!> "pvar"
+
+let pad p = pbetween pws1 pws1 p
+
+let pcurlybrackets: Parser<Expr> = pbetween (pad (pchar '{')) (pad (pchar '}')) psection  <!> "pcurlybrackets"
+
+let passign: Parser<Expr> = pseq (pleft (pad pvar) (pad (pstr "="))) (pad pcurlybrackets) Assignment <!> "passign"
+
 //parses many of the series of pairs referred to above
-let pexpr: Parser<Expr> = pmany1 psoundInstruction |>> (fun ss -> SoundInstructions ss)
+let pexpr: Parser<Expr> = pmany1 psection |>> (fun ss -> Sequence ss)
+
+
 //parses an expression and makes sure we reach the end
 let grammar: Parser<Expr> = pleft pexpr peof 
 
@@ -67,8 +104,7 @@ let parse(input: string) : Expr option =
 
 
  (* Eval *)
-let chordIntervals =
-    [(Maj, [0;4;7]), (Min, [0;3;7])]
+
 
 let noteList =
     [|C; Csharp; D; Dsharp; E; F; Fsharp; G; Gsharp; A; Asharp; B|]
@@ -138,7 +174,7 @@ let xmlPitch note octave = //returns an XML representation of a pitch
            <octave>" + (string octave) + "</octave>
          </pitch>"
 
-let xmlChord chord  = //return a string representing an XML chord
+let xmlChord chord  duration = //return a string representing an XML chord
 
     let noteNum (note): int = //convert a note into a number
         match note with
@@ -166,19 +202,19 @@ let xmlChord chord  = //return a string representing an XML chord
         match chord with //the note intervals in a chord
         | Maj(note) -> adjust [0;4;7] note
         | Min(note) -> adjust [0;3;7] note 
-    let firstNote = "<note>" + (xmlPitch (noteList[((noteNums.Head)%12)]) (4 + (noteNums.Head/12))) + "<duration>4</duration></note>" //first note does not include <chord/> add-on
+    let firstNote = "<note>" + (xmlPitch (noteList[((noteNums.Head)%12)]) (4 + (noteNums.Head/12))) + "<duration>" + (string duration) + "</duration></note>" //first note does not include <chord/> add-on
     
     let rec noteNumsToXml (noteNumList: int list) =
         match noteNumList with //starting with the tail because head is handled in special first case
         | [] -> ""
-        | head :: tail -> "<note><chord/>" + (xmlPitch (noteList[head % 12]) (4 + (head/12))) + "<duration>4</duration></note>" + (noteNumsToXml tail)
+        | head :: tail -> "<note><chord/>" + (xmlPitch (noteList[head % 12]) (4 + (head/12))) + "<duration>" + (string duration) + "</duration></note>" + (noteNumsToXml tail)
 
     
     firstNote + (noteNumsToXml (List.tail noteNums))  //return the xml representation of the chord as a string
     
     
         
-
+(*
 //goes through a list of soundInstructions and interprets them as musicxml chords
 let rec evalSoundInstructions input =
     printfn "got evalSoundInstructions with %A" input
@@ -187,7 +223,7 @@ let rec evalSoundInstructions input =
     | head::tail ->
         let sound =
             match head with
-            | Sound(instrument, chord) -> xmlChord chord
+            | Sound(chord, duration) -> xmlChord chord duration
         let sounds = evalSoundInstructions tail
         sound + sounds
 
@@ -195,5 +231,6 @@ let rec evalSoundInstructions input =
 let eval e =
     let str =
         match e with
-        | SoundInstructions ss -> evalSoundInstructions ss
+        | Sequence ss -> evalSoundInstructions ss
     prefix + measureStart + str + measureEnd + suffix
+*)
