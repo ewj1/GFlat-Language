@@ -1,8 +1,7 @@
-open AST
-module Evaluator
+module ProjInterpreter
 
+open ProjAST
 
-(* Eval *)
 
 type Env = Map<Expr, Expr> //variables link to sections
 
@@ -155,12 +154,14 @@ let playToXml input (env: Env) =
             let v =
                 match var with
                 | Variable(v) -> v
+                | _ -> failwith ("keys in environment must be variables")
             failwith ("Undefined variable '" + v + "'")                   
                 
 let evalPlay input env =
     match input with
     | Play(a) ->
         List.fold (fun x y -> x + (playToXml y env)) "" a
+    | _ -> failwith ("there must be a play in the program")
         
 //creates a complete musicxml file, with starting stuff, chords in the program, and ending stuff
 let eval e (env: Env) =
@@ -169,6 +170,7 @@ let eval e (env: Env) =
         | Program(assignments, play) ->
             let env' = evalAssignments assignments env //evaluates all the assignments
             evalPlay play env'               //returns the xml representation of the played sections
+        | _ -> failwith("highest level should be a program of a list of assignments and play")
              
     prefix + measureStart + str + measureEnd + suffix
 

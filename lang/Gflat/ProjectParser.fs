@@ -1,7 +1,7 @@
 module ProjParser
 
-open AST
-
+open ProjAST
+open Parser
 
 (* Grammar *)
 

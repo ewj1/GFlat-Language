@@ -1,4 +1,5 @@
-module AST
+module ProjAST
+
 open Parser
 
 

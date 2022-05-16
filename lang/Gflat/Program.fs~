@@ -4,7 +4,7 @@ open Evaluator
 open System.IO
 
 [<EntryPoint>]
-let main argv =
+(*let main argv =
     let env = Map<Expr, Expr> [] //variable to section map
     if argv.Length <> 1 then
         printfn "Usage: dotnet run <program>"
@@ -21,7 +21,7 @@ let main argv =
         exit 1 
     0
 
-(* to test parser only 
+ to test parser only *)
 let main argv =
     if argv.Length <> 1 then
         printfn "Usage: dotnet run <program>"
@@ -35,5 +35,3 @@ let main argv =
         printfn "Invalid program."
         exit 1 
     0
-
-*)
