@@ -38,15 +38,17 @@ type Expr =
 | Section of Sound list
 // assigns section to variable
 | Assignment of Expr * Expr
-// a list of sections and how many times they should repeat
+// a list of variables representing sections and how many times they should repeat
 | Play of (Expr * int) list
-// a type to store sequences
-| Sequence of Expr list
+// tuple of Assignment list and Play
+| Program of Expr list * Expr
 
 
 (* Grammar *)
 
 let reserved = []
+
+let pad p = pbetween pws0 pws0 p
 
 //parses a note (the letter name of a chord)
 let pnote: Parser<Note> = (pfresult (pstr "C#") Csharp) <|> (pfresult (pstr "C") C) <|> (pfresult (pstr "Db") Dflat) <|> (pfresult (pstr "D#") Dsharp) <|> (pfresult (pstr "D") D) <|> (pfresult (pstr "Eb") Eflat) <|> (pfresult (pstr "E") E) <|> (pfresult (pstr "F#") Fsharp) <|> (pfresult (pstr "F") F) <|> (pfresult (pstr "Gb") Gflat) <|> (pfresult (pstr "G#") Gsharp) <|> (pfresult (pstr "G") G) <|> (pfresult (pstr "Ab") Aflat) <|> (pfresult (pstr "A#") Asharp) <|> (pfresult (pstr "A") A) <|> (pfresult (pstr "Bb") Bflat) <|> (pfresult (pstr "B") B)
@@ -57,18 +59,18 @@ let pchordquality = (pfresult (pstr "maj") Maj) <|> (pfresult (pstr "min") Min)
 // parses a chord
 let pchord: Parser<Chord> = pleft (pseq (pleft pnote pws0) pchordquality (fun (a,b) -> b a)) pws0
 
-let pduration: Parser<int> = pmany1 pdigit
+let pnum: Parser<int> = pmany1 pdigit
                              |>> (fun digits ->
                                     let s = stringify digits
                                     let n = int s
                                     n
-                                  ) <!> "pduration"
+                                  ) <!> "pnum"
                                   
 //parses a chord and duration together
-let psound: Parser<Sound> = pseq pchord pduration (fun (a,b) -> Sound(a,b))
+let psound: Parser<Sound> = pseq pchord pnum (fun (a,b) -> Sound(a,b))
 
 //parses many instrument and chords pairs
-let psection: Parser<Expr> = (pmany1 psound) |>> (fun soundList -> Section soundList)
+let psection: Parser<Expr> = (pmany1 (pad psound)) |>> (fun soundList -> Section soundList)
 
 let pvarchar: Parser<char> = pletter <|> pdigit <!> "pvarchar"
 
@@ -81,21 +83,21 @@ let pvar: Parser<Expr> = pseq pletter (pmany0 pvarchar |>> stringify)
                                      Variable v
                                ) <!> "pvar"
 
-let pad p = pbetween pws1 pws1 p
+let pcurlybraces: Parser<Expr> = pbetween (pad (pchar '{')) (pad (pchar '}')) psection  <!> "pcurlybraces"
 
-let pcurlybrackets: Parser<Expr> = pbetween (pad (pchar '{')) (pad (pchar '}')) psection  <!> "pcurlybrackets"
+let passign: Parser<Expr> = pseq (pleft (pad pvar) (pad (pstr "="))) pcurlybraces Assignment <!> "passign"
 
-let passign: Parser<Expr> = pseq (pleft (pad pvar) (pad (pstr "="))) (pad pcurlybrackets) Assignment <!> "passign"
+let pplay = pright (pad (pstr "play")) ((pmany1 (pseq (pad pvar) (pad pnum) (fun a -> a))) |>> (fun a -> Play a)) 
 
 //parses many of the series of pairs referred to above
-let pexpr: Parser<Expr> = pmany1 psection |>> (fun ss -> Sequence ss)
+let pexpr: Parser<Expr> = pseq (pmany1 passign) pplay (fun(assignments, play) -> Program (assignments, play)) 
 
 
 //parses an expression and makes sure we reach the end
 let grammar: Parser<Expr> = pleft pexpr peof 
 
 let parse(input: string) : Expr option =
-    let i = prepare input
+    let i = debug input
     match grammar i with
     | Success(ast,_) -> Some ast
     | Failure(_,_) -> None
@@ -105,6 +107,7 @@ let parse(input: string) : Expr option =
 
  (* Eval *)
 
+type Env = Map<Expr,Expr> //variables link to sections
 
 let noteList =
     [|C; Csharp; D; Dsharp; E; F; Fsharp; G; Gsharp; A; Asharp; B|]
@@ -127,7 +130,7 @@ let prefix =
 let measureStart = 
    "<measure number=\"1\">
       <attributes>
-        <divisions>1</divisions>
+        <divisions>4</divisions>
         <key>
           <fifths>0</fifths>
         </key>
@@ -214,23 +217,52 @@ let xmlChord chord  duration = //return a string representing an XML chord
     
     
         
-(*
+
 //goes through a list of soundInstructions and interprets them as musicxml chords
-let rec evalSoundInstructions input =
-    printfn "got evalSoundInstructions with %A" input
+let rec evalSounds input =
+    printfn "got evalSounds with %A" input
     match input with
     | [] -> ""
     | head::tail ->
         let sound =
             match head with
             | Sound(chord, duration) -> xmlChord chord duration
-        let sounds = evalSoundInstructions tail
+        let sounds = evalSounds tail
         sound + sounds
 
+let rec evalAssignments input env = //input is a list of assignments
+    printfn "got evalAssignments with %A" input
+    match input with
+    | [] -> env
+    | head::tail ->
+        let env' =
+            match head with
+            | Assignment(variable: Expr, section: Expr) -> env.Add(variable, section)
+        evalAssignments tail env'
+    
+
+let playToXml input env =
+    printfn "got evalAssignments with %A" input
+    match input with
+    | (var, num) ->
+        if env.ContainsKey var then
+            let output = evalSounds (env.Item var)
+            String.replicate num output
+        else
+            failwith ("Undefined variable '" + var + "'")                   
+                
+let evalPlay input env =
+    match input with
+    | Play(a) ->
+        List.fold (fun x y -> x + (playToXml y)) "" a
+        
 //creates a complete musicxml file, with starting stuff, chords in the program, and ending stuff
-let eval e =
+let eval e env =
     let str =
-        match e with
-        | Sequence ss -> evalSoundInstructions ss
+        match e with //deconstructing the program tuple
+        | Program(assignments, play) ->
+            let env' = evalAssignments assignments env //evaluates all the assignments
+            evalPlay play env'               //returns the xml representation of the played sections
+             
     prefix + measureStart + str + measureEnd + suffix
-*)
+

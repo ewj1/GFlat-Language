@@ -2,16 +2,11 @@
 open System.IO
 
 [<EntryPoint>]
-(*let main argv =
+let main argv =
     if argv.Length <> 1 then
         printfn "Usage: dotnet run <program>"
         exit 1
     let ast_maybe = parse argv.[0]
-
-    (*match ast_maybe with
-    | Some ast ->
-        printfn "%s" (eval ast)
-    | None -> printfn "bad sentence" *)
     
     match ast_maybe with
     | Some ast ->
@@ -22,8 +17,8 @@ open System.IO
         printfn "Invalid program."
         exit 1 
     0
-*)
 
+(* to test parser only
 let main argv =
     if argv.Length <> 1 then
         printfn "Usage: dotnet run <program>"
@@ -37,3 +32,4 @@ let main argv =
         printfn "Invalid program."
         exit 1 
     0
+*)

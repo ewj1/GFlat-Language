@@ -21,11 +21,21 @@
       </attributes><note><pitch>
            <step>G</step>
            <octave>4</octave>
-         </pitch><duration>1</duration></note><note><chord/><pitch>
+         </pitch><duration>4</duration></note><note><chord/><pitch>
            <step>B</step>
            <octave>4</octave>
-         </pitch><duration>1</duration></note><note><chord/><pitch>
+         </pitch><duration>4</duration></note><note><chord/><pitch>
            <step>D</step>
            <octave>5</octave>
-         </pitch><duration>1</duration></note></measure></part>
+     </pitch><duration>4</duration></note>
+     <note><pitch>
+           <step>G</step>
+           <octave>4</octave>
+         </pitch><duration>4</duration></note><note><chord/><pitch>
+           <step>B</step>
+           <octave>4</octave>
+         </pitch><duration>4</duration></note><note><chord/><pitch>
+           <step>D</step>
+           <octave>5</octave>
+         </pitch><duration>4</duration></note></measure></part>
 </score-partwise>
