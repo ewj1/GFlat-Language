@@ -1,4 +1,6 @@
-﻿open GFlat
+﻿open AST
+open ProjParser
+open Evaluator
 open System.IO
 
 [<EntryPoint>]
