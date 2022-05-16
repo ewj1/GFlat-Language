@@ -11,15 +11,15 @@ let main argv =
     
     match ast_maybe with
     | Some ast ->
-        let output = eval ast 
+        let output = eval ast env
         use sw = new StreamWriter("output.xml")
-        sw.WriteLine(output)
+        sw.WriteLine(output) 
     | None     ->
         printfn "Invalid program."
         exit 1 
     0
 
-(* to test parser only
+(* to test parser only 
 let main argv =
     if argv.Length <> 1 then
         printfn "Usage: dotnet run <program>"
@@ -33,4 +33,5 @@ let main argv =
         printfn "Invalid program."
         exit 1 
     0
+
 *)
