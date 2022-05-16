@@ -46,7 +46,7 @@ type Expr =
 
 (* Grammar *)
 
-let reserved = []
+let reserved = ["play"]
 
 let pad p = pbetween pws0 pws0 p
 
@@ -85,12 +85,12 @@ let pvar: Parser<Expr> = pseq pletter (pmany0 pvarchar |>> stringify)
 
 let pcurlybraces: Parser<Expr> = pbetween (pad (pchar '{')) (pad (pchar '}')) psection  <!> "pcurlybraces"
 
-let passign: Parser<Expr> = pseq (pleft (pad pvar) (pad (pstr "="))) pcurlybraces Assignment <!> "passign"
+let passign: Parser<Expr> = pseq (pright (pstr "let") (pleft (pad pvar) (pad (pstr "=")))) pcurlybraces Assignment <!> "passign"
 
 let pplay = pright (pad (pstr "play")) ((pmany1 (pseq (pad pvar) (pad pnum) (fun a -> a))) |>> (fun a -> Play a)) 
 
 //parses many of the series of pairs referred to above
-let pexpr: Parser<Expr> = pseq (pmany1 passign) pplay (fun(assignments, play) -> Program (assignments, play)) 
+let pexpr: Parser<Expr> = pseq (passign) pplay (fun(assignments, play) -> Program ([assignments], play)) 
 
 
 //parses an expression and makes sure we reach the end
@@ -107,7 +107,7 @@ let parse(input: string) : Expr option =
 
  (* Eval *)
 
-type Env = Map<Expr,Expr> //variables link to sections
+type Env = Map<Expr, Expr> //variables link to sections
 
 let noteList =
     [|C; Csharp; D; Dsharp; E; F; Fsharp; G; Gsharp; A; Asharp; B|]
@@ -230,7 +230,7 @@ let rec evalSounds input =
         let sounds = evalSounds tail
         sound + sounds
 
-let rec evalAssignments input env = //input is a list of assignments
+let rec evalAssignments input (env:Env) = //input is a list of assignments
     printfn "got evalAssignments with %A" input
     match input with
     | [] -> env
@@ -238,26 +238,35 @@ let rec evalAssignments input env = //input is a list of assignments
         let env' =
             match head with
             | Assignment(variable: Expr, section: Expr) -> env.Add(variable, section)
+            | _ -> failwith ("Section definitions must come before play")
         evalAssignments tail env'
     
 
-let playToXml input env =
+let playToXml input (env: Env) =
     printfn "got evalAssignments with %A" input
     match input with
     | (var, num) ->
         if env.ContainsKey var then
-            let output = evalSounds (env.Item var)
+            let output = 
+                match (env.Item var) with
+                | Section(a) -> a
+                | _ -> failwith("values in environment must be sections")
+
+                |> evalSounds
             String.replicate num output
         else
-            failwith ("Undefined variable '" + var + "'")                   
+            let v =
+                match var with
+                | Variable(v) -> v
+            failwith ("Undefined variable '" + v + "'")                   
                 
 let evalPlay input env =
     match input with
     | Play(a) ->
-        List.fold (fun x y -> x + (playToXml y)) "" a
+        List.fold (fun x y -> x + (playToXml y env)) "" a
         
 //creates a complete musicxml file, with starting stuff, chords in the program, and ending stuff
-let eval e env =
+let eval e (env: Env) =
     let str =
         match e with //deconstructing the program tuple
         | Program(assignments, play) ->

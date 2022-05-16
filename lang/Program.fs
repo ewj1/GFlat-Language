@@ -3,6 +3,7 @@ open System.IO
 
 [<EntryPoint>]
 let main argv =
+    let env = Map<Expr, Expr> [] //variable to section map
     if argv.Length <> 1 then
         printfn "Usage: dotnet run <program>"
         exit 1
@@ -10,7 +11,7 @@ let main argv =
     
     match ast_maybe with
     | Some ast ->
-        let output = eval ast
+        let output = eval ast 
         use sw = new StreamWriter("output.xml")
         sw.WriteLine(output)
     | None     ->
