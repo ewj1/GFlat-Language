@@ -1,0 +1,9 @@
+let Chorus = {
+Cmaj 1
+Fmaj 1
+Cmaj 1
+Gmin 1
+Cmaj 4
+}
+
+play Chorus 2
