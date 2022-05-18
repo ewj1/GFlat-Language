@@ -26,7 +26,7 @@ let prefix =
 let measureStart = 
    "<measure number=\"1\">
       <attributes>
-        <divisions>4</divisions>
+        <divisions>1</divisions>
         <key>
           <fifths>0</fifths>
         </key>
