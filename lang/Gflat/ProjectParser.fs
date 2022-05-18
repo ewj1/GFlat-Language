@@ -55,8 +55,8 @@ let pexpr: Parser<Expr> = pseq (pmany1 passign) pplay (fun(assignments, play) ->
 //parses an expression and makes sure we reach the end
 let grammar: Parser<Expr> = pleft pexpr peof <!> "pgrammar"
 
-let parse(input: string) : Expr option =
-    let i = prepare input
+let parse(input: string) (debugInput: bool): Expr option =
+    let i = if debugInput then debug input else prepare input
     match grammar i with
     | Success(ast,_) -> Some ast
     | Failure(_,_) -> None
