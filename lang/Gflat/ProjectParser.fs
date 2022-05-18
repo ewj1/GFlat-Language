@@ -13,7 +13,7 @@ let pad p = pbetween pws0 pws0 p
 let pnote: Parser<Note> = (pfresult (pstr "C#") Csharp) <|> (pfresult (pstr "C") C) <|> (pfresult (pstr "Db") Dflat) <|> (pfresult (pstr "D#") Dsharp) <|> (pfresult (pstr "D") D) <|> (pfresult (pstr "Eb") Eflat) <|> (pfresult (pstr "E") E) <|> (pfresult (pstr "F#") Fsharp) <|> (pfresult (pstr "F") F) <|> (pfresult (pstr "Gb") Gflat) <|> (pfresult (pstr "G#") Gsharp) <|> (pfresult (pstr "G") G) <|> (pfresult (pstr "Ab") Aflat) <|> (pfresult (pstr "A#") Asharp) <|> (pfresult (pstr "A") A) <|> (pfresult (pstr "Bb") Bflat) <|> (pfresult (pstr "B") B) <!> "pnote"
 
 //parses the quality of a chord
-let pchordquality = (pfresult (pstr "maj") Maj) <|> (pfresult (pstr "min") Min) <!> "pchordquality"
+let pchordquality = (pfresult (pstr "maj7") Maj7) <|> (pfresult (pstr "min7") Min7) <|> (pfresult (pstr "7") Dom7) <|> (pfresult (pstr "maj") Maj) <|> (pfresult (pstr "min") Min) <!> "pchordquality"
 
 // parses a chord
 let pchord: Parser<Chord> = pleft (pseq (pleft pnote pws0) pchordquality (fun (a,b) -> b a)) pws0 <!> "pchord"

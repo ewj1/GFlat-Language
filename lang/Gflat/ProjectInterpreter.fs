@@ -100,7 +100,10 @@ let xmlChord chord  duration = //return a string representing an XML chord
             List.map (fun x -> (x + (noteNum note))) list 
         match chord with //the note intervals in a chord
         | Maj(note) -> adjust [0;4;7] note
-        | Min(note) -> adjust [0;3;7] note 
+        | Min(note) -> adjust [0;3;7] note
+        | Dom7(note) -> adjust [0;4;7;10] note
+        | Maj7(note) -> adjust [0;4;7;11] note
+        | Min7(note) -> adjust [0;3;7;10] note
     let firstNote = "<note>" + (xmlPitch (noteList[((noteNums.Head)%12)]) (4 + (noteNums.Head/12))) + "<duration>" + (string duration) + "</duration></note>" //first note does not include <chord/> add-on
     
     let rec noteNumsToXml (noteNumList: int list) =

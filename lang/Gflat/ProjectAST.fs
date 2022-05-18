@@ -29,6 +29,10 @@ type Chord =
 // chord qualities and their starting note
 | Maj of Note
 | Min of Note
+| Dom7 of Note
+| Maj7 of Note
+| Min7 of Note
+
 
 type Sound = Sound of Chord * int
 
