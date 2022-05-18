@@ -101,6 +101,8 @@ let xmlChord chord  duration = //return a string representing an XML chord
         match chord with //the note intervals in a chord
         | Maj(note) -> adjust [0;4;7] note
         | Min(note) -> adjust [0;3;7] note
+        | Dim(note) -> adjust [0;3;6] note
+        | Aug(note) -> adjust [0;4;8] note
         | Dom7(note) -> adjust [0;4;7;10] note
         | Maj7(note) -> adjust [0;4;7;11] note
         | Min7(note) -> adjust [0;3;7;10] note

@@ -32,7 +32,8 @@ type Chord =
 | Dom7 of Note
 | Maj7 of Note
 | Min7 of Note
-
+| Dim of Note
+| Aug of Note
 
 type Sound = Sound of Chord * int
 
