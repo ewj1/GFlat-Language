@@ -1,0 +1,17 @@
+let Intro = {
+    Caug 2
+    Cmaj 2
+    Cmin 2
+    Cdim 2
+}
+
+let Chorus = {
+Intro
+Cmaj 1
+Fmaj 1
+Cmaj 1
+Gmin 1
+Cmaj 4
+}
+
+play Chorus 2
