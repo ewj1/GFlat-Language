@@ -5,7 +5,7 @@ open Parser
 
 (* Grammar *)
 
-let reserved = ["play"]
+let reserved = ["play"; "let"; "="]
 
 let pad p = pbetween pws0 pws0 p
 
@@ -26,10 +26,7 @@ let pnum: Parser<int> = pmany1 pdigit
                                   ) <!> "pnum"
                                   
 //parses a chord and duration together
-let psound: Parser<Sound> = pseq pchord pnum (fun (a,b) -> Sound(a,b)) <!> "psound"
-
-//parses many instrument and chords pairs
-let psection: Parser<Expr> = (pmany1 (pad psound)) |>> (fun soundList -> Section soundList) <!> "psection"
+let psound: Parser<Expr> = pseq pchord pnum (fun (a,b) -> Sound(a,b)) <!> "psound"
 
 let pvarchar: Parser<char> = pletter <|> pdigit <!> "pvarchar"
 
@@ -41,6 +38,9 @@ let pvar: Parser<Expr> = pseq pletter (pmany0 pvarchar |>> stringify)
                                  else
                                      Variable v
                                ) <!> "pvar"
+
+//parses a list of sounds or variable representing other sections
+let psection: Parser<Expr> = (pmany1 (pad psound <|> pad pvar)) |>> (fun soundList -> Section soundList) <!> "psection"
 
 let pcurlybraces: Parser<Expr> = pbetween (pad (pchar '{')) (pad (pchar '}')) psection  <!> "pcurlybraces"
 

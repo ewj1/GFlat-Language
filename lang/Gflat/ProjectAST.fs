@@ -35,13 +35,13 @@ type Chord =
 | Dim of Note
 | Aug of Note
 
-type Sound = Sound of Chord * int
-
 type Expr =
 // variable name    
 | Variable of string
-// a series of sounds grouped together to form a part of a song (e.g. an "intro" or "chorus")
-| Section of Sound list
+// a tuple of a chord and its duration in beats
+| Sound of Chord * int
+// a series of sounds and/or variables (representing sections) grouped together to form a part of a song (e.g. an "intro" or "chorus")
+| Section of Expr list
 // assigns section to variable
 | Assignment of Expr * Expr
 // a list of variables representing sections and how many times they should repeat

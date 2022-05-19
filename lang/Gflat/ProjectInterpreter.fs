@@ -119,8 +119,8 @@ let xmlChord chord  duration = //return a string representing an XML chord
     
         
 
-//goes through a list of soundInstructions and interprets them as musicxml chords
-let rec evalSounds input =
+//goes through a list of Exprs (sounds and variables in this case) and interprets them as musicxml chords
+let rec evalSection input env =
     printfn "got evalSounds with %A" input
     match input with
     | [] -> ""
@@ -128,8 +128,28 @@ let rec evalSounds input =
         let sound =
             match head with
             | Sound(chord, duration) -> xmlChord chord duration
-        let sounds = evalSounds tail
+            | Variable(name) -> varToXml (Variable(name)) env
+            | _ -> failwith("sections should contain only sounds and other section names")
+        let sounds = evalSection tail env
         sound + sounds
+
+    
+// takes a variable representing a section and converts it to a string xml representation of that section
+and varToXml var (env: Env) =
+    printfn "got varToXml with %A" var
+    if env.ContainsKey var then
+        let output = 
+            match (env.Item var) with
+            | Section(a) -> a
+            | _ -> failwith("values in environment must be sections")
+            
+        evalSection output env
+    else
+        let v =
+            match var with
+            | Variable(v) -> v
+            | _ -> failwith ("keys in environment must be variables")
+        failwith ("Undefined variable '" + v + "'")                   
 
 let rec evalAssignments input (env:Env) = //input is a list of assignments
     printfn "got evalAssignments with %A" input
@@ -141,31 +161,17 @@ let rec evalAssignments input (env:Env) = //input is a list of assignments
             | Assignment(variable: Expr, section: Expr) -> env.Add(variable, section)
             | _ -> failwith ("Section definitions must come before play")
         evalAssignments tail env'
-    
 
-let playToXml input (env: Env) =
-    printfn "got evalAssignments with %A" input
-    match input with
-    | (var, num) ->
-        if env.ContainsKey var then
-            let output = 
-                match (env.Item var) with
-                | Section(a) -> a
-                | _ -> failwith("values in environment must be sections")
-
-                |> evalSounds
-            String.replicate num output
-        else
-            let v =
-                match var with
-                | Variable(v) -> v
-                | _ -> failwith ("keys in environment must be variables")
-            failwith ("Undefined variable '" + v + "'")                   
-                
+let evalPlayHelper (x: string) (y: Expr * int) (env: Env) =
+    let y' =
+        match y with
+        | (var, num) -> String.replicate num (varToXml var env)
+    x + y'
+                           
 let evalPlay input env =
     match input with
-    | Play(a) ->
-        List.fold (fun x y -> x + (playToXml y env)) "" a
+    | Play(sounds) -> //fix the fold function needs to deconstruct sounds into var and num
+        List.fold (fun x y -> evalPlayHelper x y env) "" sounds
     | _ -> failwith ("there must be a play in the program")
         
 //creates a complete musicxml file, with starting stuff, chords in the program, and ending stuff
