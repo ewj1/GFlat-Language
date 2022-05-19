@@ -6,7 +6,7 @@ let Intro = {
 }
 
 let Chorus = {
-Intro
+Intro 2
 Cmaj 1
 Fmaj 1
 Cmaj 1

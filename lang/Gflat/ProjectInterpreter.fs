@@ -128,7 +128,7 @@ let rec evalSection input env =
         let sound =
             match head with
             | Sound(chord, duration) -> xmlChord chord duration
-            | Variable(name) -> varToXml (Variable(name)) env
+            | Subsection(name, repeats) -> String.replicate repeats (varToXml name env)
             | _ -> failwith("sections should contain only sounds and other section names")
         let sounds = evalSection tail env
         sound + sounds
@@ -170,7 +170,7 @@ let evalPlayHelper (x: string) (y: Expr * int) (env: Env) =
                            
 let evalPlay input env =
     match input with
-    | Play(sounds) -> //fix the fold function needs to deconstruct sounds into var and num
+    | Play(sounds) -> 
         List.fold (fun x y -> evalPlayHelper x y env) "" sounds
     | _ -> failwith ("there must be a play in the program")
         

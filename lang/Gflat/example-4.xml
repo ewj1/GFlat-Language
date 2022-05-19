@@ -61,6 +61,46 @@
          </pitch><duration>2</duration></note><note><pitch>
            <step>C</step>
            <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>E</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>G</step>
+           <alter>1</alter>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><pitch>
+           <step>C</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>E</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>G</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><pitch>
+           <step>C</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>D</step>
+           <alter>1</alter>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>G</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><pitch>
+           <step>C</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>D</step>
+           <alter>1</alter>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>F</step>
+           <alter>1</alter>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><pitch>
+           <step>C</step>
+           <octave>4</octave>
          </pitch><duration>1</duration></note><note><chord/><pitch>
            <step>E</step>
            <octave>4</octave>
@@ -105,6 +145,46 @@
            <step>G</step>
            <octave>4</octave>
          </pitch><duration>4</duration></note><note><pitch>
+           <step>C</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>E</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>G</step>
+           <alter>1</alter>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><pitch>
+           <step>C</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>E</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>G</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><pitch>
+           <step>C</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>D</step>
+           <alter>1</alter>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>G</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><pitch>
+           <step>C</step>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>D</step>
+           <alter>1</alter>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><chord/><pitch>
+           <step>F</step>
+           <alter>1</alter>
+           <octave>4</octave>
+         </pitch><duration>2</duration></note><note><pitch>
            <step>C</step>
            <octave>4</octave>
          </pitch><duration>2</duration></note><note><chord/><pitch>

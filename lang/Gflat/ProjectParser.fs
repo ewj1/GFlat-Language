@@ -39,8 +39,11 @@ let pvar: Parser<Expr> = pseq pletter (pmany0 pvarchar |>> stringify)
                                      Variable v
                                ) <!> "pvar"
 
+//
+let psubsection: Parser<Expr> = pseq (pad pvar) (pad pnum) (fun (a,b) -> Subsection(a,b))
+
 //parses a list of sounds or variable representing other sections
-let psection: Parser<Expr> = (pmany1 (pad psound <|> pad pvar)) |>> (fun soundList -> Section soundList) <!> "psection"
+let psection: Parser<Expr> = (pmany1 (pad psound <|> psubsection)) |>> (fun soundList -> Section soundList) <!> "psection"
 
 let pcurlybraces: Parser<Expr> = pbetween (pad (pchar '{')) (pad (pchar '}')) psection  <!> "pcurlybraces"
 
