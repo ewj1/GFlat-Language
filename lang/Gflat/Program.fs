@@ -28,7 +28,7 @@ let main argv =
     match ast_maybe with
     | Some ast ->
         let output = eval ast env
-        use sw = new StreamWriter(file.[..file.Length-6] + "-output.xml")
+        use sw = new StreamWriter(file.[..file.Length-7] + ".xml")
         sw.WriteLine(output) 
     | None     ->
         printfn "Invalid program."
