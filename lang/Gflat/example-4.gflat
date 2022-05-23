@@ -1,17 +1,18 @@
 let Intro = {
-    Caug 2
-    Cmaj 2
-    Cmin 2
-    Cdim 2
+Cmaj 2
+}
+
+let Phrase = {
+D7 1
+A7 2
+Fmin7 3
 }
 
 let Chorus = {
-Intro 2
+Phrase 1 
 Cmaj 1
-Fmaj 1
-Cmaj 1
-Gmin 1
-Cmaj 4
+G7 1
+Phrase 2
 }
 
-play Chorus 2
+play Intro 1 Chorus 10 Intro 1

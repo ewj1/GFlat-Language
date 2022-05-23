@@ -3,8 +3,8 @@ Cmaj 2
 }
 
 let Chorus = {
-Gmaj 1
-Gmin 1
+Cmaj 1
+G7 1
 }
 
 play Intro 1 Chorus 10 Intro 1
