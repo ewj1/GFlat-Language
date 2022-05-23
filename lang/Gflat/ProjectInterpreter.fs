@@ -121,7 +121,6 @@ let xmlChord chord  duration = //return a string representing an XML chord
 
 //goes through a list of Exprs (sounds and variables in this case) and interprets them as musicxml chords
 let rec evalSection input env =
-    printfn "got evalSounds with %A" input
     match input with
     | [] -> ""
     | head::tail ->
@@ -136,7 +135,6 @@ let rec evalSection input env =
     
 // takes a variable representing a section and converts it to a string xml representation of that section
 and varToXml var (env: Env) =
-    printfn "got varToXml with %A" var
     if env.ContainsKey var then
         let output = 
             match (env.Item var) with
@@ -152,7 +150,6 @@ and varToXml var (env: Env) =
         failwith ("Undefined variable '" + v + "'")                   
 
 let rec evalAssignments input (env:Env) = //input is a list of assignments
-    printfn "got evalAssignments with %A" input
     match input with
     | [] -> env
     | head::tail ->

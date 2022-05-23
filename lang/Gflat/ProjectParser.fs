@@ -40,7 +40,7 @@ let pvar: Parser<Expr> = pseq pletter (pmany0 pvarchar |>> stringify)
                                ) <!> "pvar"
 
 //
-let psubsection: Parser<Expr> = pseq (pad pvar) (pad pnum) (fun (a,b) -> Subsection(a,b))
+let psubsection: Parser<Expr> = pseq (pad pvar) (pad pnum) (fun (a,b) -> Subsection(a,b)) <!> "psubsection"
 
 //parses a list of sounds or variable representing other sections
 let psection: Parser<Expr> = (pmany1 (pad psound <|> psubsection)) |>> (fun soundList -> Section soundList) <!> "psection"
