@@ -1,0 +1,10 @@
+let Intro = {
+Cmaj 2
+}
+
+let Chorus = {
+Cmaj 1
+G7 1
+}
+
+play Intro 1 Chorus 10 Intro 1

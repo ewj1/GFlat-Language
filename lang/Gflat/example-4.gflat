@@ -1,0 +1,18 @@
+let Intro = {
+Cmaj 2
+}
+
+let Phrase = {
+D7 1
+A7 2
+Fmin7 3
+}
+
+let Chorus = {
+Phrase 1 
+Cmaj 1
+G7 1
+Phrase 2
+}
+
+play Intro 1 Chorus 10 Intro 1

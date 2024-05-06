@@ -1,0 +1,43 @@
+let AsectionWithoutEnding = {
+    Cmin7 4
+    F7 4
+    Bbmaj7 4
+    Ebmaj7 4
+    Amin7 4
+}
+
+let AsectionEnding1 = {
+    D7 4
+    Gmin7 4
+    G7 4
+}
+
+let AsectionEnding2 = {
+    D7 4
+    Gmin7 8
+}
+
+let Bsection = {
+    Amin7 4
+    D7 4
+    Gmin7 4
+    Cmin7 4
+    F7 4
+    Bbmaj7 4
+    Amin7 4
+    D7 4
+    Gmin7 2
+    C7 2
+    Fmin7 2
+    Bb7 2
+    Amin7 4
+    D7 4
+    Gmin7 8
+}
+
+play AsectionWithoutEnding 1
+     AsectionEnding1 1
+     AsectionWithoutEnding 1
+     AsectionEnding2 1
+     Bsection 1
+     

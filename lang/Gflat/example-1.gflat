@@ -1,0 +1,4 @@
+let Song = {
+Cmaj 1
+}
+play Song 1

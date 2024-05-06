@@ -1,0 +1,10 @@
+let Chorus = {
+Emaj 2
+G#min 2
+Bdim 2
+Eaug 4
+Db7 2
+Cmaj7 2
+F#min7 2
+}
+play Chorus 2

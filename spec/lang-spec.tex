@@ -60,13 +60,12 @@
 %---------------------------------------------------------------------------------------------------------
 
 % DON'T CHANGE ANYTHING ABOVE HERE
-
+\setlength{\parindent}{1cm}
 % Edit below as instructed
 \newcommand{\MyLang}{G$\flat$}
 \newcommand{\PartnerOne}{Ezra Joffe-Hancock}
 \newcommand{\PartnerTwo}{Zach Stein-Perlman}
 \newcommand{\YOURID}{\PartnerOne{} + \PartnerTwo{}}
-
 
 \title{\MyLang: Language Specification}
 \date{Spring 2022}
@@ -77,209 +76,146 @@
 
 \vspace{\baselineskip}
 
-\section{Updates for lab 9}
-
-\begin{verbatim}
-    <expr>       ::= <sound>+
-    <sound>      ::= <instrument> <ws> <chord>
-    <chord>      ::= <note> <ws> <quality>
-    <instrument> ::= Piano
-    <ws>         ::= ␣
-    <note>       ::= C
-    <quality>    ::= Maj
-\end{verbatim}
-
-\begin{center}
-\begin{tabular}{c|c|c|c|p{5cm}} 
- Syntax & Abstract syntax & Type & Prec./Assoc. & Meaning \\ [0.5ex] 
- \hline
-  ``Piano" & Piano & Instrument & n/a & The type of instrument playing a given chord \\ 
- \hline
- ``n maj" & Maj of string & string → Chord & n/a & A chord to be played where n is some string representing the letter name of the chord \\ 
- % \hline
- % ``C maj" & Chord & string -> string & n/a & ?? \\ [1ex] 
-\end{tabular}
-\end{center}
-
 \section{Introduction}
+Ezra plays alto sax in a jazz combo here, and when he's struggling with soloing over certain songs, it helps him to run over the chord changes and play along with the recording, but the best is when there's a backing track on YouTube, so he can play along with the chords without drowning whoever is soloing on the recording. However, there are often not backing tracks for songs, or only backing tracks that are played in certain keys, so there's a need for more flexibility and availability of backing tracks. There are music notation software systems that allow you to write songs and chords, but these often take a while to write, as they're designed for a greater range of features. In other words, they're too flexible and open-ended for the purposes of a quick backing track.
 
-I (Ezra) play alto sax in a jazz combo here, and when I'm struggling with soloing over certain songs, it helps me to run over the chord changes and play along with the recording, but the best is when there's a backing track on YouTube, so I can play along with the chords without drowning whoever is soloing on the recording. I'm imagining a program that would make it easy to quickly create a backing track to play over. I imagine that you'd have to define what instrument are playing, write chords and their duration/order, set the tempo and define the length of one chorus of the song. The output would be a simple chart with the chord names along a musical bar notation of the song, and ideally a matching audio output (that keeps looping).
+We created a language that makes it easy to quickly create a backing track to play over. The programmer creates sections of music by arranging chords and choosing their durations, then describes how many times and in what order to play each section. The output is an XML file that describes the corresponding audio. MusicXML is a standard sheet music file representation that can be interpreted by many different third-party programs, and contains information that allows the music to be both visually displayed and produce audio output (as it is MIDI compatible). We leave the decision of what program to use to interpret the XML file up to the user, as there is a large range available, but note that SoundSlice (\url{https://www.soundslice.com/}) is an online free program with a neat user interface that does so (go to the website, press new slice, then "upload notation").
+
 
 \section{Design Principles}
-    Simple, accessible for a non-technical user. Try to make the syntax match normal English sentences and have built in functions and support for common musical terminology. Order of commands creates an easily readable layout. Prioritize simplicity over number of available features. If needed, we may rely on pure frequency sounds as notes if they are easier to produce than using looped recordings of real instruments. The written program is ideally easy to read and understand quickly what it contains as a simple piece of music.
+The language is simple and accessible for a non-technical user, and it should be easy to quickly translate an existing written chord progression into a program. The syntax is natural. The order of commands makes programs easily readable with intuitive layout. Simplicity in implementation is prioritized (worse is better!). A valid program is ideally easy to read and facilitates quickly understanding the music that it describes.
 
 \section{Example Programs}
 
-Example 1:
+Examples can be run by calling
+\begin{verbatim} dotnet run <input file> \end{verbatim}
+on the command line from inside the Gflat directory inside the lang directory. An XML file matching the name of the example is created in the Gflat directory, which can be put into various programs (including soundSlice) to produce musical notation or sound output. Below we see example Gflat programs highlighting different language features.
+
+Example 1: simplest possible
 \begin{verbatim}
-  start Chorus (bars 12, volume 100, tempo 120)
-      for bars(1,4):
-          piano (Cmin7)
-          guitar (Cmin7)
-      for bars(5,8):
-          piano (F7)
-  end Chorus
-  
-  play Chorus 1
+let Song = {
+Cmaj 1
+}
+play Song 1
 \end{verbatim}
 
-Example 2:
+Example 2: variety of chords and repeated chorus
 \begin{verbatim}
-  start Intro (bars 1, volume 60, tempo 100)
-      for bars(1,1):
-          piano (Gmaj)
-  end Intro
- 
-  play Intro 1
+let Chorus = {
+Emaj 2
+G#min 2
+Bdim 2
+Eaug 4
+Db7 2
+Cmaj7 2
+F#min7 2
+}
+play Chorus 2
 \end{verbatim}
 
-Example 3:
+Example 3: multiple sections defined, sections reused in play
 \begin{verbatim}
-  start Chorus (bars 3, volume 100, tempo 144)
-      for bars(1,3):
-          piano (Cmaj)
-  end Chorus
-  
-  play Chorus 4
+let Intro = {
+Cmaj 2
+}
+
+let Chorus = {
+Cmaj 1
+G7 1
+}
+
+play Intro 1 Chorus 10 Intro 1
 \end{verbatim}
 
-\begin{comment}
-Example 1:
+Example 4: sections used within other sections, number of times they repeat specified
 \begin{verbatim}
-  start Chorus (bars(4) 12, volume 100, tempo 120)
-      for bars(1,12):
-          drums swing
-      for bars(1,4):
-          piano and guitar (Cmin7)
-      for bars(5,8):
-          piano and guitar (F7)
-      for bars(9,12):
-          piano and guitar (D7)
-  end Chorus
-  
-  play Chorus
-\end{verbatim}
+let Intro = {
+Cmaj 2
+}
 
-Example 2:
-\begin{verbatim}
-  start Intro (bars(4) 1, volume 60, tempo 100)
-      for bars(1,1):
-          drums funk
-  end Intro
-  
-  start Chorus (bars(4) 12, volume 80, tempo 100)
-      for bars(1,12):
-          drums funk
-      for bars(1,4):
-          piano and guitar (Cmin7)
-          bass walk (Cmin7)
-      for bars(5,8):
-          piano and guitar (Fmaj)
-          bass walk (F7)
-      for bars(9,9):
-          set volume 100
-          piano and bass (F#dim7)
-      for bars(10,12):
-          piano and guitar (D7)
-          bass walk (D7)
-  end Chorus
-  
-  play Intro 4
-  play Chorus 10
-\end{verbatim}
+let Phrase = {
+D7 1
+A7 2
+Fmin7 3
+}
 
-Example 3:
-\begin{verbatim}
-  start Chorus (bars(4) 6, volume 100, tempo 144)
-      for bars(1,1):
-          piano (Cmaj)
-      for bars(2,2):
-          piano (Fmaj)
-      for bars(3,3):
-          piano (Cmaj)
-      for bars(4,4):
-          piano and guitar (G7)
-      for bars(5,6):
-          piano (Cmaj)
-  end Chorus
-  play Chorus
-\end{verbatim}
-\end{comment}
+let Chorus = {
+Phrase 1 
+Cmaj 1
+G7 1
+Phrase 2
+}
 
+play Intro 1 Chorus 10 Intro 1
+\end{verbatim}
 \section{Language Concepts}
-    In order to program in the language, a user should understand the sounds/names of different instruments, have a basic understanding of chords (so they can specify them by writing out their letters), an understanding of a bar/measure which is a grouping of several beats of music. They should understand also how to transfer information from a written piece of sheet music with chords to information within the language, by copying down chords and putting them loops for the appropriate bars. We hope to also provide specifiers like volume, and tempo, so a user should understand how those qualities would affect the output. 
+In order to program in the language, a user should have a basic understanding of chords (so they can specify them by writing out their letters, and understanding different chord qualities) and an understanding of a beats as a way to think about the duration of chords. They should understand also how to transfer information from a written piece of sheet music with chords to information within the language, by copying down chords and putting them in different sections as appropriate to efficiently capture the structure of a song.
 
 
 \section{Syntax}
+Programs have two parts: defining sections and playing them. When defining a section, we give the name of the section, and its components: chord-duration pairs and references to other sections and how many times to repeat them. A chord is made up of a note (representing the starting note of the chord) and a chord quality (either Major, Minor, Diminished, Augmented, Dominant 7th, Major 7th, or Minor 7th). A chord is followed by an integer specifying the number of beats we want the chord to be played for. In the play section of the program, we refer to an order of section names and the number of times we want each one to be played. If a section is defined multiple times within a program (i.e. a section with the same name is assigned more than once) only the latest definition will be used (thus the practice should be avoided). 
 
-    The syntax of the language is roughly as follows:
-    
-    We envision the largest grouping being a song, composed of several sections of music. These sections are named by the user, and when defined the user also defines the number of beats in a bar, the number of bars in the section, and the section's starting volume and tempo. The "start \textless sectionName \textgreater" command allows the users to indicate the start of a section, and the end of the section must be indicated by an accompanying "end \textless sectionName \textgreater " command. The content of the bars is specified by "for" loop declarations, the conditions of which are a range of bars, and the content of which are sound instructions. A sound instruction is composed of instruments, and what they are playing at that moment. For certain instruments, this might be chords, for others such as drums it might a selected type of beat from a limited number of options. The "and" keyword allows a set of instructions (either chord/note or a set volume/tempo) to be applied to a series of specified instruments rather than one. Each sound instruction should be on a different line within the for loop. Chords are composed of notes, but this abstraction is not revealed to the user, so that they can simply type the name of the chord and have the correct output. If a note name is accompanied by a chordal quality, such as maj, 7, min, etc. then it represents a chord. If it has no such specifier, then it represents an individual note and the instrument will make the sound accordingly. There are also the set command, which allows users to define values like the volume and tempo within a sound instruction, should they wish to change it. At the end of the program, the play function allows the user to specify the order in which the sections should be played, as well how many times. 
+
+
+\begin{verbatim}
+<expr>       ::= <assignment>+ <play>
+<assignment> ::= let ␣ <variable> <ws> = <section>
+<section>    ::= <ws> { noise+ } <ws>
+<noise>      ::= <ws> <subsection> <ws> | <ws> <sound> <ws>
+<subsection> ::= <ws> <variable> <ws> <int> <ws>
+<sound>      ::= <chord> <int>
+<chord>      ::= <note> <ws> <quality> <ws>
+<ws>         ::= ␣*
+<note>       ::= A | A# | Bb | B | C | C# | Db | D | D# | Eb | E | F | F# 
+               | Gb | G | G# | Ab
+<quality>    ::= maj | min | dim | aug | 7 | maj7 | min7
+<variable>   ::= <string>
+<play>       ::= play content+
+<content>    ::= <ws> <variable> <ws> <int> <ws>
+\end{verbatim}
+Note that \begin{verbatim}<variable>\end{verbatim} may not be ``play" or ``let". Encoding this in BNF would be long and unenlightening, so we just mention it here.
+% If we did not allow redefining sections---if defining Chorus and then defining Chorus was invalid---we would say:
+% The grammar of G$\flat$ appears not to be context-free---the language is too powerful, letting users define section names!---so we must mention outside the above description first that each \begin{verbatim}<variable>\end{verbatim} must be distinct (and not be ``play" or ``let") and second that each \begin{verbatim}<variable>\end{verbatim} in \begin{verbatim}<play>\end{verbatim} must be defined in \begin{verbatim}<assignments>\end{verbatim}
 
 \section{Semantics}
-\begin{enumerate}[i]
-    \item What are the primitive kinds of values in your system? One kind of primitive value in our language are notes, which are of type char and are later converted using some sort of dictionary structure into either floats representing note frequencies, or directly to audio samples. Another primitive are integers, which are used to define the values of volume, tempo, bars range, and number of repeats of sections. Chords are a primitive and are a list of notes, and are created by interpreting a the name of a chord into its component notes according to some function that operates according to the rules of music theory. Instruments are primitives that are strings that represent different types of sound, they are probably matched to entries in a dictionary of dictionaries that contain audio files representing notes. Volume and tempo are primitives that are of type integer and are tied to a volume level in the output and the speed at which the audio files are played, respectively. Sound instructions are a tuple of an instrument and a chord. A sequence is a tuple of (a tuple of ints that represent the start and end bars) and a list of sound instructions. Sections are a 5-tuple of a string representing their name and an int representing the number of bars in the section and an int representing the volume level and an int representing the tempo and a list of sequences. 
 
-    \item What are the “actions” or compositional elements of your language? In other words, how are
-values combined? 
-    As sort of outlined above, Instruments and chords are combined into sound instructions, which are in turn combined in sequences which follow the syntax of 
-    "for bars(start: int, end: int) 
-        1 or more <sound instruction>"
-    
-    Sections are marked by a "start \textless sectionName \textgreater" command and then a series of indented sequences until the "end \textless sectionName\textgreater" command is reached. These sections are then given as input to the play function, which produces the output of a sections (a sound or audio file) a given number of times.
-    
-    The only other thing to note is that the "and" operator can be used as an infix operator between instruments to make them both assigned the following chord in a sound instruction. The and operator will actually generate separate sound instructions for each instrument involved.
-    
-    \item How is your program represented? In other words, what components (types) will be used in
-your AST? 
-    Again sort of addressed above, but the types from the bottom up are Note of Int, Chord of Note list, Instrument of string, soundInstruction of Instrument * Chord, Sequence of Instruction list * (int * int), Section of string * (soundInstruction list).
-    
-    \item How do AST elements “fit together” to represent programs as abstract syntax? For the three
-example programs you gave earlier, provide sample abstract syntax trees.
-    
-    
-    
-    Note: the current assumption is that we will somehow be able to play multiple sounds at once, either through some system player function (which we need to research) or through composing them as tracks in an audio file (which can then be played by a computer).
-    
-    \begin{figure}[htp]
-    \centering
-    \includegraphics[width=10cm]{example1.jpeg}
-    \caption{AST for example 1}
-    \end{figure}
-    
-    \begin{figure}[htp]
-    \centering
-    \includegraphics[width=10cm]{example2.jpeg}
-    \caption{AST for example 2}
-    \end{figure}
-    
-    \begin{figure}[htp]
-    \centering
-    \includegraphics[width=10cm]{example3.jpeg}
-    \caption{AST for example 3}
-    \end{figure}
-    
-    \newpage\item \begin{enumerate}[A]
-        \item Our programs read no input.
-        
-        \item Our programs output an audio file or plays sounds, not sure yet.
-        
-        \item Evaluation is usually conceived of as a post-order traversal of an AST. Describe how
-such a traversal yields the effect you just described and provide illustrations for clarity. Demonstrate evaluation for at least one of your example programs.
-    Such a traversal yields the desired structure because Chords and Instruments are paired together first in an instruction and then instructions are assembled into a sequence and then sequences fit within sections and sections are "enacted" by the play function which takes the int that represents the number of times a section should be played, only once that section has been defined through all the sub evaluations.
-    
-    
-    
-    \begin{figure}[htp]
-    \centering
-    \includegraphics[width=10cm]{evaluationOrder.jpeg}
-    \caption{Evaluating AST for example 3}
-    \end{figure}
-        
-    \end{enumerate}
+Primitives in G$\flat$ include notes, which are every type of chromatic note with equivalent notes represented both as flats and sharps (e.g. G\# and A$\flat$) but not when there is no proper flat or sharp version of the note (e.g. E\# and F$\flat$). Chord qualities are a primitive. Section names are another primitive, and are of string. Another primitive are integers, which are used specify the duration of chords, the number of times a section repeats when referred to in another section, and the number of times a section repeats when referred to in play.
 
-\end{enumerate}
 
+
+\begin{center}
+\begin{tabular}{c|c|c|c|p{4cm}} 
+Syntax & Abstract syntax & Type & Prec./Assoc. & Meaning \\ [0.5ex] 
+\hline
+C & Note & Note & n/a & A note \\ \hline
+Cmaj & Quality of Note & Chord & n/a & A chord to be played where C stands for the note and maj for the quality \\ \hline
+Cmaj 1 & Sound of Chord * int & Expr & n/a & A chord and its duration \\ \hline
+Chorus & Variable of string & Expr & n/a & The name of a section \\ \hline
+Chorus 1 & Subsection of Expr * int & Expr & n/a & A section and how many times to repeat it. \\ \hline
+sound1 ... soundn & Section of Expr list & Expr & n/a & A sequence of sounds and subsections \\ \hline
+let var = \{section\} & Assignment of Expr * Expr & Expr & n/a & A pairing of a section with a name \\ \hline
+% assign1 ... assignn & Assignments of Assignment list & Assignment list → Assignments & n/a & A list of sections and their associated names \\ \hline
+play var1 x1 ... varn xn & Play of (Expr * int) list & Expr & n/a & A specification of sections to play \\ \hline
+$<$Assignment list$>$ $<$Play$>$ & Program of Expr list * Expr & Expr & n/a & A complete program \\ 
+\end{tabular}
+\end{center}
+
+\section{Remaining Work}
+
+Potential extensions:
+
+- Implement a program correctness checker; e.g., allowing for inconsistencies in capitalization
+
+- Add instruments beyond piano
+
+- Allow more flexible control over tempo, volume, and octave
+
+- Allow for individual notes and custom chords (where the user specifies all the notes in them if they are not a standard chord)
+% We could easily implement a simple "tonic" chord quality; with more work we could allow arbitrary user-defined chords
+
+- Chord names printed above chords in musical notation representation
+% - Pretty printing of musical notation corresponding to the audio
+% ^We can actually get this from the XML too.
 
 % DO NOT DELETE ANYTHING BELOW THIS LINE
 \end{document}
